@@ -1,0 +1,10 @@
+{
+  "model_name": "Best_LogReg_SMOTE",
+  "best_threshold": 0.79,
+  "test_accuracy": 0.95,
+  "test_precision": 0.92,
+  "test_recall": 0.88,
+  "test_f1": 0.9,
+  "test_roc_auc": 0.94,
+  "test_pr_auc": 0.89
+}

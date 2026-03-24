@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(where python:*)",
+      "Bash(pip list:*)",
+      "Bash(where python3:*)",
+      "Read(//c/Users/Beddad/AppData/Local/Programs/**)",
+      "Read(//c/Users/Beddad/anaconda3/**)",
+      "Read(//c/Users/Beddad/miniconda3/**)",
+      "Read(//c/Users/Beddad/AppData/Local/Programs//**)",
+      "Bash(/c/Users/Beddad/anaconda3/python.exe -c \"import pandas, sklearn, imblearn, xgboost, lightgbm, matplotlib; print\\('all ok'\\)\")",
+      "Bash(/c/Users/Beddad/anaconda3/python.exe -c \"import pandas, sklearn, imblearn, matplotlib; print\\(''''base ok''''\\)\")",
+      "Bash(/c/Users/Beddad/anaconda3/python.exe -m pip install xgboost lightgbm -q)",
+      "Bash(/c/Users/Beddad/anaconda3/python.exe -c \"import xgboost, lightgbm; print\\('xgb:', xgboost.__version__, 'lgbm:', lightgbm.__version__\\)\")",
+      "Bash(/c/Users/Beddad/anaconda3/python.exe -m nbconvert --to notebook --execute \"/c/Users/Beddad/Desktop/Neuro_Project/notebooks/02_advanced_modeling.ipynb\" --output \"/c/Users/Beddad/Desktop/Neuro_Project/notebooks/02_advanced_modeling.ipynb\" --ExecutePreprocessor.timeout=300 2>&1)",
+      "Bash(.venv/Scripts/python -c \"import ast, sys; ast.parse\\(open\\(''app.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(.venv/Scripts/python -c \":*)",
+      "Bash(.venv/Scripts/python -c \"import matplotlib; print\\(matplotlib.__version__, matplotlib.__file__\\)\")",
+      "Bash(.venv/Scripts/pip install:*)",
+      "Bash(.venv/Scripts/python -c \"import matplotlib; print\\(''version:'', matplotlib.__version__\\)\")",
+      "Bash(.venv/Scripts/python fix_matplotlib.py)",
+      "Bash(rm fix_matplotlib.py)",
+      "Bash(.venv/Scripts/python -c \"import ast; ast.parse\\(open\\(''app.py'', encoding=''utf-8''\\).read\\(\\)\\); print\\(''Syntax OK''\\)\")",
+      "Bash(.venv/Scripts/pip show:*)"
+    ]
+  }
+}
