@@ -3,25 +3,32 @@ NeuroScan AI – Stroke Risk Assessment System
 Professional clinical decision-support tool for stroke screening.
 """
 
+import sys
+from pathlib import Path
+
+# ── Make the src package importable regardless of working directory ────────────
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from pathlib import Path
 
-from sklearn.pipeline import Pipeline
-from imblearn.pipeline import Pipeline as ImbPipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler, FunctionTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.model_selection import train_test_split
+from stroke_prediction.config import (
+    DATA_RAW,
+    THRESHOLD_SENSITIVE,
+    THRESHOLD_STANDARD,
+)
+from stroke_prediction.data.preprocessing import (
+    build_inference_row,
+    build_preprocessor,
+    get_feature_groups,
+    load_and_split,
+)
+from stroke_prediction.models.train import load_or_train
 
 # ─── Constants ────────────────────────────────────────────────────────────────
-DATA_PATH          = Path("data/raw_data/healthcare-dataset-stroke-data.csv")
-THRESHOLD_STANDARD  = 0.72   # LogReg_Balanced  (F2-optimised, higher precision)
-THRESHOLD_SENSITIVE = 0.14   # LogReg_Balanced_calibrated (F2-optimised, higher recall)
+DATA_PATH = DATA_RAW / "healthcare-dataset-stroke-data.csv"
 
 # ─── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -249,47 +256,9 @@ header[data-testid="stHeader"] { background: transparent; }
 # ═══════════════════════════════════════════════════════════════════════════════
 @st.cache_resource(show_spinner="Loading AI models…")
 def load_models():
-    df = pd.read_csv(DATA_PATH)
-    df = df[df["gender"] != "Other"].copy()
-    if "id" in df.columns:
-        df.drop(columns=["id"], inplace=True)
-
-    X = df.drop(columns=["stroke"])
-    y = df["stroke"]
-
-    X_train, _, y_train, _ = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
-
-    num_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
-    cat_cols = X.select_dtypes(include=["object", "category", "bool"]).columns.tolist()
-
-    num_pipe = Pipeline([
-        ("imputer",       SimpleImputer(strategy="median")),
-        ("log_transform", FunctionTransformer(np.log1p, validate=False)),
-        ("scaler",        StandardScaler()),
-    ])
-    cat_pipe = Pipeline([
-        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
-    ])
-    preprocessor = ColumnTransformer([
-        ("num", num_pipe, num_cols),
-        ("cat", cat_pipe, cat_cols),
-    ], sparse_threshold=0.0)
-
-    # ── Standard model (LogReg_Balanced, F2 threshold 0.72) ─────────────────
-    standard_pipe = ImbPipeline([
-        ("preprocessor", preprocessor),
-        ("model", LogisticRegression(
-            max_iter=3000, random_state=42, class_weight="balanced"
-        )),
-    ])
-    standard_pipe.fit(X_train, y_train)
-
-    # ── Sensitive model (calibrated, F2 threshold 0.14) ─────────────────────
-    sensitive_pipe = CalibratedClassifierCV(standard_pipe, method="isotonic", cv=3)
-    sensitive_pipe.fit(X_train, y_train)
-
+    X_train, _, y_train, _ = load_and_split()
+    standard_pipe, sensitive_pipe = load_or_train(X_train, y_train)
+    num_cols, cat_cols = get_feature_groups(X_train)
     return standard_pipe, sensitive_pipe, num_cols, cat_cols
 
 
@@ -298,18 +267,12 @@ def load_models():
 # ═══════════════════════════════════════════════════════════════════════════════
 def build_input_df(gender, age, hypertension, heart_disease, ever_married,
                    work_type, residence, glucose, bmi, smoking):
-    return pd.DataFrame([{
-        "gender":            gender,
-        "age":               float(age),
-        "hypertension":      int(hypertension),
-        "heart_disease":     int(heart_disease),
-        "ever_married":      ever_married,
-        "work_type":         work_type,
-        "Residence_type":    residence,
-        "avg_glucose_level": float(glucose),
-        "bmi":               float(bmi) if bmi else np.nan,
-        "smoking_status":    smoking,
-    }])
+    return build_inference_row(
+        gender=gender, age=age, hypertension=hypertension,
+        heart_disease=heart_disease, ever_married=ever_married,
+        work_type=work_type, residence_type=residence,
+        avg_glucose_level=glucose, bmi=bmi, smoking_status=smoking,
+    )
 
 
 def get_risk_factors(age, hypertension, heart_disease, glucose, bmi, smoking):

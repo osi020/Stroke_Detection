@@ -1,0 +1,48 @@
+# ── Python ─────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environment ─────────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Jupyter ─────────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── IDE / OS ────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Secrets & environment variables ────────────────────────────────────────────
+.env
+.env.*
+secrets.yaml
+
+# ── Model artefacts (large binary files — use Git LFS if needed) ───────────────
+models/artifacts/*.pkl
+models/artifacts/*.joblib
+models/artifacts/*.h5
+models/artifacts/*.pt
+models/artifacts/*.onnx
+
+# ── Generated reports (reproducible from notebooks) ────────────────────────────
+# models/reports/          ← keep CSVs and figures in version control
+# data/processed/          ← keep processed data if small
+
+# ── Raw data (often too large or has licence restrictions) ─────────────────────
+# data/raw/                ← uncomment if data must not be committed
