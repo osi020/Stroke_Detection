@@ -94,7 +94,7 @@ Neuro_Project/
 
 1. **Clone the repository**:
    ```bash
-   git clone <https://github.com/osi020/Stroke_Detection>
+   git clone https://github.com/osi020/Stroke_Detection
    cd Neuro_Project
    ```
 
